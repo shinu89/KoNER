@@ -858,21 +858,6 @@ class Optimization:
 
         return updates
 
-# def random_weights(shape):
-#     """
-#     Return weights of a given shape, with values randomly
-#     distributed around zero.
-#     """
-#     drange = np.sqrt(6. / (np.sum(shape)))
-#     return drange * np.random.uniform(low=-1.0, high=1.0, size=shape)
-#
-#
-# def create_shared(value, name):
-#     """
-#     Create a shared object of a numpy array.
-#     """
-#     return theano.shared(value=np.array(value, dtype=floatX), name=name)
-
 def set_values(name, param, pretrained):
     """
     Initialize a network parameter with pretrained values.
