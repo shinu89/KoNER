@@ -9,7 +9,7 @@ from loader import make_gazette_to_dic, prepare_sentence
 from utils import evaluate_lexicon_tagger
 from loader import load_sentences
 from model import Model
-from konlpy.tag import Kkma
+from konlpy.tag import Kkma, Mecab
 from konlpy.utils import pprint
 import re
 import optparse
@@ -55,65 +55,83 @@ def split_sentence(input_filename):
     return sentences
 
 
-def transform_pos(value):
+def transform_pos(value, tagger='kkma'):
     """
     Transformation rule from KKMA to Sejong pos tag
     :param value: predicted pos tag (KKMA)
     :return: transformed pos tag (Sejong)
     """
-    if value == 'NNM':
-        return 'NNB'
-    elif value == 'VXV' or value == 'VXA':
-        return 'VX'
-    elif value == 'MDT' or value == 'MDN':
-        return 'MM'
-    elif value == 'MAC':
-        return 'MAJ'
-    elif value == 'JKM':
-        return 'JKB'
-    elif value == 'JKI':
-        return 'JKV'
-    elif value == 'EPH' or value == 'EPT' or value == 'EPP':
-        return 'EP'
-    elif value == 'EFN' or value == 'EFQ' or value == 'EFO' or value == 'EFA' or value == 'EFI' or value == 'EFR':
-        return 'EF'
-    elif value == 'ECE' or value == 'ECD' or value == 'ECS':
-        return 'EC'
-    elif value == 'ETD':
-        return 'ETM'
-    elif value == 'UN':
-        return 'NF'
-    elif value == 'UV':
-        return 'NV'
-    elif value == 'UE':
-        return 'NA'
-    elif value == 'OL':
-        return 'SL'
-    elif value == 'OH':
-        return 'SH'
-    elif value == 'ON':
-        return 'SN'
-    elif value == 'XPV':
-        return 'XPN'
-    else:
-        return value
+    if tagger == 'kkma':
+        if value == 'NNM':
+            return 'NNB'
+        elif value == 'VXV' or value == 'VXA':
+            return 'VX'
+        elif value == 'MDT' or value == 'MDN':
+            return 'MM'
+        elif value == 'MAC':
+            return 'MAJ'
+        elif value == 'JKM':
+            return 'JKB'
+        elif value == 'JKI':
+            return 'JKV'
+        elif value == 'EPH' or value == 'EPT' or value == 'EPP':
+            return 'EP'
+        elif value == 'EFN' or value == 'EFQ' or value == 'EFO' or value == 'EFA' or value == 'EFI' or value == 'EFR':
+            return 'EF'
+        elif value == 'ECE' or value == 'ECD' or value == 'ECS':
+            return 'EC'
+        elif value == 'ETD':
+            return 'ETM'
+        elif value == 'UN':
+            return 'NF'
+        elif value == 'UV':
+            return 'NV'
+        elif value == 'UE':
+            return 'NA'
+        elif value == 'OL':
+            return 'SL'
+        elif value == 'OH':
+            return 'SH'
+        elif value == 'ON':
+            return 'SN'
+        elif value == 'XPV':
+            return 'XPN'
+        else:
+            return value
+    elif tagger == 'mecab':
+        if value == 'NNBC':
+            return 'NNB'
+        elif value == 'SSO' or value == 'SSC':
+            return 'SS'
+        elif value == 'SC':
+            return 'SP'
+        # elif value == 'SY':
+        else:
+            return value
+          
 
-
-def tag_pos(sentences):
+def tag_pos(sentences, tagger='kkma'):
     """
     Predict Part-of-Speech tag of input sentences
     PoS tagger: KKMA
     :param sentences: list of input sentences
     :return: tagged sentences
     """
-    kkma = Kkma()
-
+    if tagger == 'kkma':
+        kkma = Kkma()
+    elif tagger == 'mecab':
+        mecab = Mecab()
+                
     morph_lists = []
     for sent in sentences:
         morph_list = []
-        pos_tagged_sentences = kkma.pos(sent)
+        if tagger == 'kkma':
+            pos_tagged_sentences = kkma.pos(sent)
+        elif tagger == 'mecab':
+            pos_tagged_sentences = mecab.pos(sent)
+            
         for (key, value) in pos_tagged_sentences:
-            value = transform_pos(value)
+            value = transform_pos(value, tagger)
             morph_list.append([key, value])
         morph_lists.append(morph_list)
 
@@ -128,7 +146,7 @@ if __name__=="__main__":
         test_sentences = load_sentences(input_filename, zeros=1)
     else:
         sentences = split_sentence(input_filename)
-        test_sentences = tag_pos(sentences)
+        test_sentences = tag_pos(sentences, tagger='mecab')
         pprint(test_sentences)
 
 
