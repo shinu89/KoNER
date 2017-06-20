@@ -25,7 +25,7 @@ KoNER (Korean Named Entity Recognizer)는 한국어 개체명 인식기이다.
 >> tar -xvf model.tar.gz
 ```
 
-### Command
+## Run Command
 ```
 python main.py -i [input_file_path] -o [output_file_path] -m [model_path] -p [input type 0(=raw), 1(=pos)]
 ```
